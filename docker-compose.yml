@@ -1,4 +1,4 @@
-version: "3.8"
+# version: "3.8"
 
 services:
   mcp_classifier:
@@ -12,33 +12,22 @@ services:
     build: ./mcp_scraper
     ports:
       - "8002:8002"
-    env_file:
-      - .env
-
   mcp_summarizer:
     build: ./mcp_summarizer
     ports:
       - "8003:8003"
-    env_file:
-      - .env
 
   mcp_entity_extractor:
     build: ./mcp_entity_extractor
     ports:
       - "8004:8004"
-    env_file:
-      - .env
 
   mcp_vectorstore:
     build: ./mcp_vectorstore
     ports:
       - "8005:8005"
-    env_file:
-      - .env
 
   orchestrator:
     build: ./orchestrator
     ports:
       - "8000:8000"
-    env_file:
-      - .env
