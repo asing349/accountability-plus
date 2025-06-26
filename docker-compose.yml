@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  mcp_classifier:
+    build: ./mcp_classifier
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+
+  # Define your services here
