@@ -1,0 +1,39 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Pytest cache
+.pytest_cache/
+
+# Environment variables
+.env
+
+# Docker
+*.pid
+*.seed
+*.pid.lock
+
+# VSCode and IDEs
+.vscode/
+.idea/
+
+# MacOS
+.DS_Store
+
+# Log files
+*.log
+
+# Data files
+*.sqlite3
