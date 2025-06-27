@@ -22,11 +22,15 @@ services:
     build: ./mcp_summarizer
     ports:
       - "8003:8003"
+    env_file:
+      - .env
 
   mcp_entity_extractor:
     build: ./mcp_entity_extractor
     ports:
       - "8004:8004"
+    env_file:
+      - .env
 
   mcp_vectorstore:
     build: ./mcp_vectorstore
