@@ -1,0 +1,6 @@
+fastapi
+httpx
+langgraph
+uvicorn
+psycopg2-binary
+aiohttp
