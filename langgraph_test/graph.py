@@ -21,10 +21,16 @@ class State(TypedDict, total=False):
 async def cache_probe_node(state: State) -> State:
     cache = await hc.vector_cache_probe(state["query"])
     if cache.get("hits"):
+        record_id = cache["hits"][0]["id"]
+        record = await hc.get_record_by_id(record_id)
         return {
             **state,
             "cached": True,
-            "vector_id": cache["hits"][0]["id"]
+            "vector_id": record_id,
+            "sm_out": record.get("summarizer_output"), # Pass full summary
+            "ent_out": record.get("entity_output"),   # Pass full entities
+            "websearch_output": record.get("websearch_output"), # Pass websearch_output
+            "query": record.get("query") # Pass original query
         }
     # Initialize the vec_payload just like main.py
     return {
