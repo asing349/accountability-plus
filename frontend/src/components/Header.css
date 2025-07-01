@@ -1,0 +1,11 @@
+.header {
+  width: 100%;
+  padding: 20px 0;
+  text-align: center;
+  color: #88ccff; /* Muted blue for header text */
+  font-size: 2.2em; /* Slightly larger */
+  text-shadow: 0 0 10px rgba(136, 204, 255, 0.5); /* Subtle blue glow */
+  background-color: rgba(0, 0, 0, 0.4); /* More transparent dark background */
+  border-bottom: 1px solid rgba(136, 204, 255, 0.3); /* Subtle glowing border */
+  font-weight: 300; /* Lighter font weight */
+}

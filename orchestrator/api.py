@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware # Import CORS
 import json
 
 from main import process_query   # Import from main.py in the same folder
@@ -8,6 +9,20 @@ from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
 app = FastAPI(title="Orchestrator")
 start_metrics_server(9000)
+
+# Add CORS middleware
+origins = [
+    "http://localhost",
+    "http://localhost:3000", # Allow requests from your frontend
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/healthz")
 def health():

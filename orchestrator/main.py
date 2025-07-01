@@ -11,7 +11,16 @@ async def process_query(original_query: str) -> Dict:
     print("\n[ORCH] cache probe output:", cache)
     if cache.get("hits"):
         print("[ORCH] cache HIT, skipping pipeline.")
-        return {"cached": True, "vector_id": cache["hits"][0]["id"]}
+        record_id = cache["hits"][0]["id"]
+        record = await hc.get_record_by_id(record_id)
+        return {
+            "query": original_query, # Added original query
+            "cached": True,
+            "vector_id": record_id,
+            "summary_text": record.get("summarizer_output"),
+            "entity_output": record.get("entity_output"),
+            "websearch_output": record.get("websearch_output")
+        }
 
     # === BEGIN: Vectorizer payload ===
     vectorizer_payload = {
@@ -131,8 +140,21 @@ async def process_query(original_query: str) -> Dict:
     LATENCY.labels("vectorizer").observe(time.perf_counter() - t0)
 
     return {
+        "query": original_query, # Added original query
         "cached": False,
         "vector_id": vec_out.get("id"),
-        "summary_text": sm_out,
-        "entity_output": ent_out
+        "summary_text": sm_out.get("raw_output") if isinstance(sm_out, dict) else sm_out,
+        "entity_output": ent_out,
+        "websearch_output": vectorizer_payload.get("websearch_output")
     }
+
+
+if __name__ == "__main__":
+    # Example usage
+    async def main():
+        query = "What happened to the USS Indianapolis?"
+        result = await process_query(query)
+        print("\n--- FINAL RESULT ---")
+        print(result)
+
+    asyncio.run(main())

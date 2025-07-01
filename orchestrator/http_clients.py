@@ -10,7 +10,8 @@ URLS: Dict[str, str] = {
     "summarizer":   "http://mcp_summarizer:8003/summarize_case_raw",
     "entity":       "http://mcp_entity_extractor:8004/extract_raw",
     "vectorizer":   "http://mcp_vectorstore:8005/vectorize",
-    "vectorstore":  "http://mcp_vectorstore:8005/query",  # same as above, just /query path
+    "vectorstore":  "http://mcp_vectorstore:8005/query",
+    "record":       "http://mcp_vectorstore:8005/record"  # New endpoint
 }
 
 # Define timeouts per MCP
@@ -27,6 +28,21 @@ async def _post(url: str, payload: Dict[str, Any], timeout: aiohttp.ClientTimeou
         try:
             async with aiohttp.ClientSession(timeout=timeout) as session:
                 async with session.post(url, json=payload, headers=HEADERS) as r:
+                    r.raise_for_status()
+                    return await r.json()
+        except Exception as exc:
+            attempt += 1
+            if attempt >= RETRIES:
+                print(f"[http_clients] giving up on {url} – {exc}")
+                return {}
+            await asyncio.sleep(BACKOFF * (2 ** (attempt - 1)))
+
+async def _get(url: str, timeout: aiohttp.ClientTimeout) -> Dict[str, Any]:
+    attempt = 0
+    while attempt < RETRIES:
+        try:
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(url) as r:
                     r.raise_for_status()
                     return await r.json()
         except Exception as exc:
@@ -57,3 +73,7 @@ async def call_vectorizer(bundle_payload: Dict[str, Any]) -> Dict[str, Any]:
 
 async def vector_cache_probe(query: str) -> Dict[str, Any]:
     return await _post(URLS["vectorstore"], {"query": query}, DEFAULT_TIMEOUT)
+
+async def get_record_by_id(record_id: str) -> Dict[str, Any]:
+    url = f'{URLS["record"]}/{record_id}'
+    return await _get(url, DEFAULT_TIMEOUT)

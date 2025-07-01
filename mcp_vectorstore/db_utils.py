@@ -1,6 +1,6 @@
 import os
 import psycopg2
-from psycopg2.extras import register_uuid, Json
+from psycopg2.extras import register_uuid, DictCursor
 
 register_uuid()  # make sure UUID works transparently
 
@@ -14,4 +14,5 @@ def get_pg_conn():
         f"host={os.getenv('PG_HOST')} "
         f"port={os.getenv('PG_PORT', 5432)}"
     )
-    return psycopg2.connect(dsn, sslmode="require")
+    # Use DictCursor to get rows as dictionaries
+    return psycopg2.connect(dsn, sslmode="require", cursor_factory=DictCursor)

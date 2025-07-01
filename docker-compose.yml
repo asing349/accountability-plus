@@ -49,3 +49,22 @@ services:
     build: ./langgraph_test
     ports:
       - "8007:8007"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - REACT_APP_API_URL=http://localhost:8000
+    ports:
+      - "3000:80"
+    depends_on:
+      - orchestrator
+      - langgraph_orchestrator
+      - mcp_classifier
+      - mcp_scraper
+      - mcp_summarizer
+      - mcp_entity_extractor
+      - mcp_vectorstore
+      - mcp_websearch
+    environment:
+      - CHOKIDAR_USEPOLLING=true

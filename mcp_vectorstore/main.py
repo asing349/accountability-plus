@@ -60,6 +60,14 @@ class QueryResponse(BaseModel):
     hits: List[QueryHit]
 
 
+class RecordResponse(BaseModel):
+    query: str
+    summarizer_output: Optional[str] = None
+    entity_output: Optional[dict] = None
+    scraper_output: Optional[str] = None
+    websearch_output: Optional[dict] = None
+
+
 # ───────────────────────────── Endpoints ──────────────────────────────
 @app.post("/vectorize", response_model=VectorizeResponse)
 def vectorize(body: VectorizeBody):
@@ -88,6 +96,7 @@ def vectorize(body: VectorizeBody):
     now = datetime.utcnow()
 
     # Insert into Supabase / Postgres
+    print(f"[VECTORSTORE] websearch_output before insert: {body.websearch_output}")
     with get_pg_conn() as conn, conn.cursor() as cur:
         cur.execute(
             """
@@ -106,7 +115,7 @@ def vectorize(body: VectorizeBody):
                 body.category,
                 body.scraper_output,
                 body.summarizer_output,
-                psycopg2.extras.Json(body.websearch_output) if body.websearch_output else None,
+                psycopg2.extras.Json(body.websearch_output) if body.websearch_output is not None else None,
                 psycopg2.extras.Json(body.entity_output) if body.entity_output else None,
                 all_text,
                 embedding,
@@ -152,3 +161,40 @@ def query(body: QueryBody):
         for row in rows
     ]
     return {"hits": hits}
+
+
+@app.get("/record/{record_id}", response_model=RecordResponse)
+def get_record(record_id: uuid.UUID):
+    """Retrieve a specific record by its UUID."""
+    with get_pg_conn() as conn, conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT query, summarizer_output, entity_output, scraper_output, websearch_output
+            FROM query_embeddings
+            WHERE id = %s
+            """,
+            (str(record_id),),
+        )
+        row = cur.fetchone()
+
+    if not row:
+        raise HTTPException(status_code=404, detail="Record not found")
+
+    return RecordResponse(
+        query=row[0],
+        summarizer_output=row[1],
+        entity_output=row[2],
+        scraper_output=row[3],
+        websearch_output=row[4]
+    )
+
+
+@app.get("/healthz")
+def health():
+    return {"ok": True}
+
+
+if __name__ == "__main__":
+    # Example usage
+    # ... (omitted for brevity)
+    pass

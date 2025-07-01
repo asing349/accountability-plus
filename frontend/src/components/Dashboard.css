@@ -1,0 +1,87 @@
+.dashboard-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Two columns: 70% for narrative, 30% for entities */
+  grid-template-rows: auto auto;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 20px auto;
+  background-color: rgba(20, 20, 20, 0.8); /* Slightly lighter dark background for the dashboard area */
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 100, 200, 0.2); /* Subtle blue glow */
+  color: #e0e0e0; /* Light gray text */
+}
+
+.panel {
+  background-color: rgba(30, 30, 30, 0.9); /* Darker background for individual panels */
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 100, 200, 0.3); /* Subtle blue border */
+  box-shadow: 0 0 10px rgba(0, 100, 200, 0.1);
+}
+
+.query-panel {
+  grid-column: 1 / 3; /* Spans both columns */
+  text-align: left; /* Left align query */
+}
+
+.query-text {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #88ccff; /* Muted blue for query */
+  margin-bottom: 10px;
+}
+
+.narrative-panel {
+  grid-column: 1 / 2; /* Left column */
+  min-height: 400px;
+  overflow-y: auto;
+  text-align: left; /* Left align narrative */
+}
+
+.narrative-content p {
+  margin-bottom: 1em;
+  line-height: 1.6;
+}
+
+.entities-panel {
+  grid-column: 2 / 3; /* Right column */
+  text-align: left; /* Left align entities */
+}
+
+.entity-list p {
+  margin-bottom: 0.8em;
+}
+
+.entity-list strong {
+  color: #88ccff; /* Muted blue for strong text */
+}
+
+.links-panel {
+  grid-column: 1 / 3; /* Spans both columns */
+  text-align: left; /* Left align links */
+}
+
+.link-list {
+  list-style: none;
+  padding: 0;
+}
+
+.link-list li {
+  margin-bottom: 8px;
+}
+
+.link-list a {
+  color: #66ccff; /* Lighter blue for links */
+  text-decoration: none;
+}
+
+.link-list a:hover {
+  text-decoration: underline;
+}
+
+.link-source {
+  font-size: 0.8em;
+  color: #a0a0a0;
+  margin-left: 5px;
+}
