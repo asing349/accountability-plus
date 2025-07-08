@@ -139,7 +139,7 @@ const LoadingScreen = ({ loadingComplete }) => {
       <Box flex="1" />
 
       {/* Main content area for messages and spinner */}
-      <VStack spacing={4} width="80%" maxW="800px" justify="center" align="center">
+      <VStack spacing={4} width="100%" justify="center" align="center">
         <VStack
           ref={logContainerRef}
           spacing={2}
