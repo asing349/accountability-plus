@@ -61,35 +61,68 @@ const CliInput = ({ onSearch, isLoading }) => {
 };
 
 // Loading Screen (Data Stream)
-const LoadingScreen = () => {
+const LoadingScreen = ({ loadingComplete }) => {
   const messages = [
     "[STATUS] Initializing secure protocols...",
     "[TASK] Querying external data sources...",
     "[PROGRESS] Analyzing data streams...",
     "[TASK] Synthesizing comprehensive narrative...",
     "[STATUS] Extracting entities...",
-    "[COMPLETE] Finalizing report...",
+    "[INFO] Creating your dashboard...",
   ];
-  const [currentMessage, setCurrentMessage] = useState(messages[0]);
-  const [logLines, setLogLines] = useState([]);
 
-  useEffect(() => {
+  const [logLines, setLogLines] = React.useState([]);
+  const [progress, setProgress] = React.useState(0);
+  const logContainerRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (logContainerRef.current) {
+      const element = logContainerRef.current;
+      element.scrollTop = element.scrollHeight;
+    }
+  }, [logLines]);
+
+  React.useEffect(() => {
+    if (loadingComplete) {
+      setProgress(100);
+      setTimeout(() => {
+        setLogLines((prev) => [...prev, "[COMPLETE] Finalizing report..."]);
+      }, 500);
+      return;
+    }
+
     let messageIndex = 0;
-    const interval = setInterval(() => {
-      const newMessage = messages[messageIndex];
-      setLogLines((prev) => [...prev, newMessage]);
-      setCurrentMessage(newMessage);
-      messageIndex = (messageIndex + 1) % messages.length;
-    }, 2000); // Change message every 2 seconds
+    setLogLines([messages[messageIndex++]]);
 
-    return () => clearInterval(interval);
-  }, []);
+    const messageInterval = setInterval(() => {
+      if (messageIndex < messages.length) {
+        setLogLines((prev) => [...prev, messages[messageIndex++]]);
+      } else {
+        clearInterval(messageInterval);
+      }
+    }, 12000);
+
+    const progressInterval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 95) {
+          clearInterval(progressInterval);
+          return 95;
+        }
+        return prev + 1;
+      });
+    }, 684); // ~65 seconds to reach 95%
+
+    return () => {
+      clearInterval(messageInterval);
+      clearInterval(progressInterval);
+    };
+  }, [loadingComplete]);
 
   return (
     <Flex
       direction="column"
       align="center"
-      justify="center"
+      justify="space-between" /* Distribute space vertically */
       height="100vh"
       width="100vw"
       bg="rgba(0,0,0,0.95)"
@@ -100,18 +133,54 @@ const LoadingScreen = () => {
       color="terminalGreen"
       fontFamily="monospace"
       overflow="hidden"
+      p={4} /* Add some padding to the main container */
     >
-      <VStack spacing={2} mb={8} maxH="70vh" overflowY="auto" px={4} width="100%">
-        {logLines.map((line, index) => (
-          <Text key={index} fontSize={{ base: "sm", md: "md" }} opacity={1 - (logLines.length - 1 - index) * 0.1}>
-            {line}
-          </Text>
-        ))}
+      {/* Top spacer to push content down if needed, or just let content center naturally */}
+      <Box flex="1" />
+
+      {/* Main content area for messages and spinner */}
+      <VStack spacing={4} width="80%" maxW="800px" justify="center" align="center">
+        <VStack
+          ref={logContainerRef}
+          spacing={2}
+          overflowY="auto"
+          width="100%" /* Keep width 100% for the log container */
+          align="center" /* Center content within this VStack */
+          justify="center" /* Center content within this VStack */
+          css={{
+            '&::-webkit-scrollbar': {
+              display: 'none'
+            },
+            'msOverflowStyle': 'none',
+            'scrollbarWidth': 'none'
+          }}
+        >
+          {logLines.map((line, index) => (
+            <Text key={index} fontSize={{ base: "sm", md: "md" }} opacity={1 - (logLines.length - 1 - index) * 0.15} textAlign="center">
+              {line}
+            </Text>
+          ))}
+        </VStack>
+        <Box h="50px" display="flex" alignItems="center" justifyContent="center">
+          {!loadingComplete ? (
+            <Spinner size="xl" color="terminalGreen" />
+          ) : (
+            <Text fontSize={{ base: "lg", md: "xl" }} color="accentGreen">✓ Compilation Successful</Text>
+          )}
+        </Box>
       </VStack>
-      <Spinner size="xl" color="terminalGreen" mb={4} />
-      <Text fontSize={{ base: "lg", md: "xl" }} textAlign="center">
-        {currentMessage}
-      </Text>
+
+      {/* Bottom section for progress bar and redirecting message */}
+      <VStack spacing={2} width="80%" maxW="800px" mb={4} align="flex-start">
+        {progress > 0 && (
+          <Box w="100%" bg="gray.700" borderRadius="md" overflow="hidden" h="10px">
+            <Box h="100%" w={`${progress}%`} bg="terminalGreen" transition="width 0.2s linear" />
+          </Box>
+        )}
+        <Text fontSize={{ base: "lg", md: "xl" }} textAlign="center">
+          {loadingComplete ? "Redirecting to dashboard..." : "Processing..."}
+        </Text>
+      </VStack>
     </Flex>
   );
 };
@@ -226,11 +295,13 @@ const Dashboard = ({ data, onNewQuery }) => {
 // --- Main App Component --- //
 function App() {
   const [loading, setLoading] = useState(false);
+  const [loadingComplete, setLoadingComplete] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
   const handleSearch = async (query) => {
     setLoading(true);
+    setLoadingComplete(false);
     setResult(null);
     setError(null);
     try {
@@ -249,9 +320,12 @@ function App() {
 
       const data = await response.json();
       setResult(data);
+      setLoadingComplete(true);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500); // Keep loading screen for 1.5s after completion
     } catch (e) {
       setError(e.message);
-    } finally {
       setLoading(false);
     }
   };
@@ -269,7 +343,7 @@ function App() {
           <CliInput onSearch={handleSearch} isLoading={loading} />
         )}
 
-        {loading && <LoadingScreen />}
+        {loading && <LoadingScreen loadingComplete={loadingComplete} />}
 
         {error && (
           <VStack spacing={4} p={8} bg="red.900" borderRadius="md" boxShadow="lg" maxW="md" textAlign="center">
