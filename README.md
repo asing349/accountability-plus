@@ -1,7 +1,5 @@
 # Accountability++
 
-![Accountability++ Banner](https://via.placeholder.com/1500x300/0A0A0A/88CCFF?text=Accountability%2B%2B%20%7C%20Uncover%20the%20Truth)
-
 A modular, AI-powered platform for in-depth incident and case research, summarization, and entity extraction. Leverage the power of large language models and web scraping to transform unstructured data into actionable insights.
 
 ## Table of Contents
@@ -25,13 +23,9 @@ A modular, AI-powered platform for in-depth incident and case research, summariz
 
 ## Demo
 
-<!-- Demo Video -->
-<p align="center">
-  <video width="600" controls>
-    <source src="docs/AccountabilityDemo.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
-</p>
+
+https://github.com/user-attachments/assets/0b7acba7-3889-4cdf-8aec-a86742113320
+
 
 ## Overview
 
