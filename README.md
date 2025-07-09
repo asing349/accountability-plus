@@ -212,7 +212,6 @@ This command will:
 ├── mcp_websearch/           # Microservice for web search
 ├── orchestrator/            # Main orchestration service
 ├── langgraph_test/          # Experimental LangGraph orchestrator
-└── prometheus/              # Prometheus monitoring configuration
 ```
 
 ## Frontend Access
